@@ -3,10 +3,13 @@ package com.friendlycaptcha.jvm.sdk;
 import java.util.Objects;
 
 /**
- * VerifyResult is a wrapper around the response of an /api/v2/captcha/siteverify request.
+ * VerifyResult is a wrapper around the response of an
+ * /api/v2/captcha/siteverify request.
  * 
- * The main methods are `shouldAccept` and `wasAbleToVerify`, the first one you should use to determine if the user's
- * request should be accepted, the second one to determine if the request was able to be verified. If that returns
+ * The main methods are `shouldAccept` and `wasAbleToVerify`, the first one you
+ * should use to determine if the user's
+ * request should be accepted, the second one to determine if the request was
+ * able to be verified. If that returns
  * false, you should alert yourself.
  */
 public class VerifyResult {
@@ -27,7 +30,8 @@ public class VerifyResult {
      * 
      * Otherwise this will be set to one of the error codes in `ErrorCodes`:
      * * `ErrorCodes.REQUEST_FAILED`
-     * * `ErrorCodes.FAILED_DUE_TO_CLIENT_ERROR` (see response.error for more details, your API key might be wrong).
+     * * `ErrorCodes.FAILED_DUE_TO_CLIENT_ERROR` (see response.error for more
+     * details, your API key might be wrong).
      * * `ErrorCodes.FAILED_TO_ENCODE_REQUEST`
      * * `ErrorCodes.FAILED_TO_DECODE_RESPONSE`
      */
@@ -38,11 +42,14 @@ public class VerifyResult {
     }
 
     /**
-     * @return whether the `strict` option was set to true on the client. In `strict` mode this will only return `true`
-     * if the request was successful (e.g. verification could happen), and the challenge was solved successfully.
+     * @return whether the `strict` option was set to true on the client. In
+     *         `strict` mode this will only return `true`
+     *         if the request was successful (e.g. verification could happen), and
+     *         the challenge was solved successfully.
      * 
-     * By default, `strict` is set to `false`, which means that the request will be accepted if the challenge could
-     * not be verified (also called *fail open*).
+     *         By default, `strict` is set to `false`, which means that the request
+     *         will be accepted if the challenge could
+     *         not be verified (also called *fail open*).
      */
     public boolean isStrict() {
         return strict;
@@ -64,13 +71,16 @@ public class VerifyResult {
             if (strict) {
                 return false;
             }
-            if (errorCode.equals(ErrorCode.REQUEST_FAILED) || errorCode.equals(ErrorCode.FAILED_DUE_TO_CLIENT_ERROR) || errorCode.equals(ErrorCode.FAILED_TO_DECODE_RESPONSE)) {
+            if (errorCode.equals(ErrorCode.REQUEST_FAILED) || errorCode.equals(ErrorCode.FAILED_DUE_TO_CLIENT_ERROR)
+                    || errorCode.equals(ErrorCode.FAILED_TO_DECODE_RESPONSE)) {
                 return true;
             }
             return false;
         }
 
-        throw new RuntimeException("Implementation error in friendly-captcha-java-sdk shouldAccept: error should never be null if success is false. " + this);
+        throw new RuntimeException(
+                "Implementation error in friendly-captcha-java-sdk shouldAccept: error should never be null if success is false. "
+                        + this);
     }
 
     /**
@@ -83,7 +93,8 @@ public class VerifyResult {
     }
 
     /**
-     * Was unable to encode the captcha response. This means the captcha response was invalid and should never be accepted.
+     * Was unable to encode the captcha response. This means the captcha response
+     * was invalid and should never be accepted.
      * 
      * @return true if there was an encoding error, false otherwise.
      */
@@ -92,7 +103,8 @@ public class VerifyResult {
     }
 
     /**
-     * Something went wrong making the request to the Friendly Captcha API, perhaps there is a network connection issue?
+     * Something went wrong making the request to the Friendly Captcha API, perhaps
+     * there is a network connection issue?
      * 
      * @return true if there was a request error, false otherwise.
      */
@@ -110,7 +122,8 @@ public class VerifyResult {
     }
 
     /**
-     * Something went wrong on the client side, this generally means your configuration is wrong.
+     * Something went wrong on the client side, this generally means your
+     * configuration is wrong.
      * Check your secrets (API key) and sitekey.
      * 
      * See `response.error` for more details.
@@ -132,7 +145,8 @@ public class VerifyResult {
     }
 
     /**
-     * Get the error field from the response as was returned by the API, or null if the field is not present.
+     * Get the error field from the response as was returned by the API, or null if
+     * the field is not present.
      * 
      * @return the error field from the response, or null if not present.
      */
@@ -180,15 +194,19 @@ public class VerifyResult {
     }
 
     /**
-     * Whether the request to verify the captcha was completed. In other words: the API responded with status 200.
-     * If this is false, you should notify yourself and check `errorCode` to see what is wrong.
+     * Whether the request to verify the captcha was completed. In other words: the
+     * API responded with status 200.
+     * If this is false, you should notify yourself and check `errorCode` to see
+     * what is wrong.
      * 
      * @return true if the request was able to be verified, false otherwise.
      */
     public boolean wasAbleToVerify() {
         if (isEncodeError()) {
-            // Despite not being able to make the request, if we are not even able to encode the captcha response
-            // we can be certain it's invalid and were thus able to verify it without even making a request.
+            // Despite not being able to make the request, if we are not even able to encode
+            // the captcha response
+            // we can be certain it's invalid and were thus able to verify it without even
+            // making a request.
             return true;
         }
         return status == 200 && !isRequestError() && !isDecodeError();

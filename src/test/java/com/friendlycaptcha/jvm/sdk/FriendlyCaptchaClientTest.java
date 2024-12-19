@@ -7,12 +7,13 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.List;
 import java.util.stream.Stream;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.TestInstance;
@@ -49,8 +50,8 @@ public class FriendlyCaptchaClientTest {
     private TestCasesFile casesFile;
 
     @BeforeAll
-    public void setup() throws IOException {
-        URL url = new URL(MOCK_SERVER_URL + "/api/v1/tests");
+    public void setup() throws IOException, URISyntaxException {
+        URL url = new URI(MOCK_SERVER_URL + "/api/v1/tests").toURL();
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.setRequestMethod("GET");
 
@@ -77,26 +78,15 @@ public class FriendlyCaptchaClientTest {
     @ParameterizedTest(name = "{0}")
     @MethodSource("provideTestCases")
     public void runTestCase(TestCase testCase) throws Exception {
-
-        if (!testCase.name.equals("bad_request")) {
-            return;
-        }
-
         FriendlyCaptchaClient client = new FriendlyCaptchaClient(
                 new FriendlyCaptchaClientOptions()
                         .setApiKey(API_KEY)
                         .setApiEndpoint(MOCK_SERVER_URL + "/api/v2/captcha/siteverify")
                         .setStrict(testCase.strict)
         );
-
-        // Log the siteverify response for debugging purposes
-        System.out.println(testCase.siteverify_response);
         
 
         VerifyResult result = client.verifyCaptchaResponse(testCase.response).get();
-        System.out.println(result.errorCode);
-        System.out.println(result.exception);
-        System.out.println(result.isClientError());
 
         assertEquals(testCase.expectation.should_accept, result.shouldAccept(), testCase.name);
         assertEquals(testCase.expectation.was_able_to_verify, result.wasAbleToVerify(), testCase.name);

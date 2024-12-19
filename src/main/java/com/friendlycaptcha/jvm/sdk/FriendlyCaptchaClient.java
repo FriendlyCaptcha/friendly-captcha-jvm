@@ -1,5 +1,6 @@
 package com.friendlycaptcha.jvm.sdk;
 
+import java.io.InputStream;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URI;
@@ -73,27 +74,30 @@ public class FriendlyCaptchaClient {
                 connection.setRequestMethod("POST");
                 connection.setRequestProperty("Content-Type", "application/json");
                 connection.setRequestProperty("Accept", "application/json");
-                connection.setRequestProperty("Frc-Sdk", "friendly-captcha-java@" + Version.SDK_VERSION);
+                connection.setRequestProperty("Frc-Sdk", Metadata.getInstance().sdkIdentifier);
                 connection.setRequestProperty("X-Api-Key", this.apiKey);
                 connection.setDoOutput(true);
-                connection.getOutputStream().write(body.getBytes());
-
                 connection.setConnectTimeout(timeout);
                 connection.setReadTimeout(timeout);
 
+                connection.getOutputStream().write(body.getBytes());
+
                 int status = connection.getResponseCode();
                 result.setStatus(status);
+
+                ObjectMapper objectMapper = ObjectMapperSingleton.getInstance();
+                InputStream inputStream = status >= 400 ? connection.getErrorStream() : connection.getInputStream();
                 if (status >= 400 && status < 500) {
                     result.setErrorCode(ErrorCode.FAILED_DUE_TO_CLIENT_ERROR);
                 }
 
-                ObjectMapper objectMapper = ObjectMapperSingleton.getInstance();
                 try {
-                    result.setResponse(objectMapper.readValue(connection.getInputStream(), VerifyResponse.class));
+                    result.setResponse(objectMapper.readValue(inputStream, VerifyResponse.class));
                 } catch (IOException e) {
                     result.setException(e);
                     result.setErrorCode(ErrorCode.FAILED_TO_DECODE_RESPONSE);
                 }
+                
             } catch (IOException e) {
                 result.setException(e);
                 result.setErrorCode(ErrorCode.REQUEST_FAILED);

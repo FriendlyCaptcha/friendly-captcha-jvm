@@ -7,7 +7,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 /**
  * Singleton class for ObjectMapper. ObjectMapper is thread-safe and can be reused, and is expensive to create.
  */
-public class ObjectMapperSingleton {
+public final class ObjectMapperSingleton {
 	protected static final ObjectMapper objectMapperSingleton = JsonMapper.builder()
 		.findAndAddModules().addModule(new JavaTimeModule()).build();
 
