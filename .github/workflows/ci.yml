@@ -1,0 +1,40 @@
+name: JVM SDK CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        java-versions: ["8", "11", "16", "21"]
+
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup Java ${{ matrix.java-versions }}
+      uses: actions/setup-java@v4
+      with:
+        distribution: 'temurin'
+        java-version: ${{ matrix.java-versions }}
+    - name: Run the SDK testserver
+      run: |
+        docker run -d -p 1090:1090 friendlycaptcha/sdk-testserver:latest
+        echo "SDK Test server started. Checking its health..."
+        for i in {1..20}; do
+          if curl -s http://localhost:1090; then
+            echo "SDK test server is responding!"
+            break
+          else
+            echo "Attempt $i: SDK test server not yet responding. Waiting for 1 second..."
+            sleep 1
+          fi
+        done
+    - name: Test
+      run: | 
+        mvn test
