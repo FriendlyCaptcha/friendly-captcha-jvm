@@ -23,7 +23,7 @@ jobs:
           server-username: MAVEN_USERNAME
           server-password: MAVEN_PASSWORD
           gpg-private-key: '${{ secrets.GPG_PRIVATE_KEY }}'
-          gpg-passphrase: GPG_PRIVATE_KEY
+          gpg-passphrase: GPG_PASSPHRASE
 
       - name: Extract version from tag
         id: extract_version
