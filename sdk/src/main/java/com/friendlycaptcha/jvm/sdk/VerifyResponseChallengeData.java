@@ -28,4 +28,8 @@ public class VerifyResponseChallengeData {
     public String getOrigin() {
         return origin;
     }
+
+    public String toString() {
+        return "VerifyResponseChallengeData{timestamp=" + this.timestamp + ", origin='" + this.origin + "'}";
+    }
 }

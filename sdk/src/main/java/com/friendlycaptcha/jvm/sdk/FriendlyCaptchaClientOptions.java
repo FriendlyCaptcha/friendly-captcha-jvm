@@ -25,8 +25,9 @@ public class FriendlyCaptchaClientOptions {
      * 
      * @param sitekey the sitekey to set.
      */
-    public void setSitekey(String sitekey) {
+    public FriendlyCaptchaClientOptions setSitekey(String sitekey) {
         this.sitekey = sitekey;
+        return this;
     }
 
     /**

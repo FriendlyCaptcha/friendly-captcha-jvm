@@ -6,4 +6,8 @@ public class VerifyResponseData {
     public VerifyResponseChallengeData getChallenge() {
         return challenge;
     }
+
+    public String toString() {
+        return "VerifyResponseData{challenge=" + this.challenge + "}";
+    }
 }

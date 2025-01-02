@@ -32,4 +32,8 @@ public class VerifyResponse {
     public VerifyResponseError getError() {
         return error;
     }
+
+    public String toString() {
+        return "VerifyResponse{success=" + this.success + ", data=" + this.data + ", error=" + this.error + "}";
+    }
 }

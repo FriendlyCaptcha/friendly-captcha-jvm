@@ -15,4 +15,8 @@ public class VerifyResponseError {
     public String getDetail() {
         return detail;
     }
+
+    public String toString() {
+        return "VerifyResponseError{errorCode='" + this.errorCode + "', detail='" + this.detail + "'}";
+    }
 }
