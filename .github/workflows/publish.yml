@@ -23,14 +23,15 @@ jobs:
         run: echo "::set-output name=VERSION::${GITHUB_REF#refs/tags/}"
 
       - name: Set version in pom.xml
-        run: mvn versions:set -DnewVersion=${{ steps.extract_version.outputs.VERSION }}
+        run: mvn versions:set -DgenerateBackupPoms=false -DnewVersion=${{ steps.extract_version.outputs.VERSION }}
 
       - name: Commit version change
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git checkout -b bump-version-to-${{ steps.extract_version.outputs.VERSION }}
-          git commit -am "Set version to ${{ steps.extract_version.outputs.VERSION }}"
+          git add .
+          git commit -m "Set version to ${{ steps.extract_version.outputs.VERSION }}"
           git push origin bump-version-to-${{ steps.extract_version.outputs.VERSION }}
 
       - name: Create pull request
@@ -39,12 +40,11 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           branch: bump-version-to-${{ steps.extract_version.outputs.VERSION }}
           title: "Set version to ${{ steps.extract_version.outputs.VERSION }}"
-          body: "This PR sets the version to${{ steps.extract_version.outputs.VERSION }} based on the release tag."
+          body: "This PR sets the version to ${{ steps.extract_version.outputs.VERSION }} based on the release tag."
           base: main
 
       - name: Build with Maven
         run: mvn clean install
-        working-directory: sdk
 
       - name: Deploy to Maven Central
         run: mvn deploy -P release
