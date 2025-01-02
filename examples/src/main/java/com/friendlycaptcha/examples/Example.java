@@ -13,6 +13,7 @@ import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateExceptionHandler;
 
+import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
@@ -88,11 +89,15 @@ public class Example {
                     exchange.sendResponseHeaders(200, 0);
                     processTemplate(exchange, cfg, model);
                 } else if ("POST".equals(exchange.getRequestMethod())) {
-                    // Parse the request body
-                    String requestBody = new String(exchange.getRequestBody().readAllBytes(), StandardCharsets.UTF_8);
+                    // Parse the request body (in a way that supports Java 7)
+                    byte[] bytes = new byte[exchange.getRequestBody().available()];
+                    try (DataInputStream dis = new DataInputStream(exchange.getRequestBody())) {
+                        dis.readFully(bytes);
+                    }
+                    String requestBody = new String(bytes, StandardCharsets.UTF_8);
+                
                     Map<String, String> formData = parseFormData(requestBody);
                     String responseToken = formData.get("frc-captcha-response");
-
                     try {
                         // Verify the response token
                         VerifyResult result = client.verifyCaptchaResponse(responseToken).get();
