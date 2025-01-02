@@ -17,7 +17,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class FriendlyCaptchaClient {
     private static final String GLOBAL_ENDPOINT = "https://global.frcapi.com";
     private static final String EU_ENDPOINT = "https://eu.frcapi.com";
-    private static final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+
+    private static final int THREAD_POOL_SIZE = Runtime.getRuntime().availableProcessors() * 4; // Arbitrary..
+    private static final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(THREAD_POOL_SIZE);
 
     private String sitekey;
     private String apiKey;
@@ -26,7 +28,7 @@ public class FriendlyCaptchaClient {
     private boolean strict;
 
     public FriendlyCaptchaClient(FriendlyCaptchaClientOptions opts) {
-        // validate throws an exception if the options are invalid.
+        // Note: validate() throws an exception if the options are invalid.
         opts.validate();
 
         this.sitekey = opts.getSitekey();
