@@ -11,6 +11,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
 
       - name: Set up JDK 8
         uses: actions/setup-java@v2
@@ -20,28 +22,35 @@ jobs:
 
       - name: Extract version from tag
         id: extract_version
-        run: echo "::set-output name=VERSION::${GITHUB_REF#refs/tags/}"
+        run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
+
+      - name: Find branch associated with tag
+        id: find_branch
+        run: |
+          TAG_NAME=${GITHUB_REF#refs/tags/}
+          BRANCH_NAME=$(git branch -r --contains $TAG_NAME | grep -v '\->' | head -n 1 | sed 's/.*origin\///' | tr -d ' ')
+          echo "BRANCH_NAME=${BRANCH_NAME}" >> $GITHUB_ENV
 
       - name: Set version in pom.xml
-        run: mvn versions:set -DgenerateBackupPoms=false -DnewVersion=${{ steps.extract_version.outputs.VERSION }}
+        run: mvn versions:set -DgenerateBackupPoms=false -DnewVersion=${{ env.VERSION }}
 
       - name: Commit version change
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git checkout -b bump-version-to-${{ steps.extract_version.outputs.VERSION }}
+          git checkout -b bump-version-to-${{ env.VERSION }}
           git add .
-          git commit -m "Set version to ${{ steps.extract_version.outputs.VERSION }}"
-          git push origin bump-version-to-${{ steps.extract_version.outputs.VERSION }}
+          git commit -m "Set version to ${{ env.VERSION }}"
+          git push origin bump-version-to-${{ env.VERSION }}
 
       - name: Create pull request
         uses: peter-evans/create-pull-request@v3
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          branch: bump-version-to-${{ steps.extract_version.outputs.VERSION }}
-          title: "Set version to ${{ steps.extract_version.outputs.VERSION }}"
-          body: "This PR sets the version to ${{ steps.extract_version.outputs.VERSION }} based on the release tag."
-          base: main
+          branch: bump-version-to-${{ env.VERSION }}
+          title: "Set version to ${{ env.VERSION }}"
+          body: "This PR sets the version to ${{ env.VERSION }} based on the release tag."
+          base: ${{ env.BRANCH_NAME }}
 
       - name: Build with Maven
         run: mvn clean install
