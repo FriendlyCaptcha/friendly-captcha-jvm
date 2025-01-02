@@ -24,7 +24,6 @@ jobs:
 
       - name: Set version in pom.xml
         run: mvn versions:set -DnewVersion=${{ steps.extract_version.outputs.VERSION }}
-        working-directory: sdk
 
       - name: Commit version change
         run: |
