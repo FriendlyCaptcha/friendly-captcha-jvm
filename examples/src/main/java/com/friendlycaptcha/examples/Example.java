@@ -89,7 +89,7 @@ public class Example {
                     exchange.sendResponseHeaders(200, 0);
                     processTemplate(exchange, cfg, model);
                 } else if ("POST".equals(exchange.getRequestMethod())) {
-                    // Parse the request body (in a way that supports Java 7)
+                    // Parse the request body (in a way that supports Java 8)
                     byte[] bytes = new byte[exchange.getRequestBody().available()];
                     try (DataInputStream dis = new DataInputStream(exchange.getRequestBody())) {
                         dis.readFully(bytes);
