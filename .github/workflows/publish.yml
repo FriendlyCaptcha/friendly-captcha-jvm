@@ -66,5 +66,4 @@ jobs:
           MAVEN_USERNAME: ${{ secrets.SONATYPE_USER_TOKEN_USERNAME }}
           MAVEN_PASSWORD: ${{ secrets.SONATYPE_USER_TOKEN_PASSWORD }}
           GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
-          GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
         working-directory: sdk
