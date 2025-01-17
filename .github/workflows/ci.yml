@@ -12,7 +12,7 @@ jobs:
 
     strategy:
       matrix:
-        java-versions: ["8", "11", "16", "21"]
+        java-versions: ["11", "16", "21"]
 
     steps:
     - uses: actions/checkout@v4
