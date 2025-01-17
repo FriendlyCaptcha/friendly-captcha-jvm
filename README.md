@@ -11,8 +11,8 @@ Add the following dependency to your `pom.xml`:
 ```xml
 <dependency>
     <groupId>com.friendlycaptcha.jvm</groupId>
-    <artifactId>friendly-captcha-jvm</artifactId>
-    <version>1.0.0</version>
+    <artifactId>sdk</artifactId>
+    <version>0.1.0</version>
 </dependency>
 ```
 
