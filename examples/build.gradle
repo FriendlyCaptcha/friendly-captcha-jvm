@@ -1,0 +1,17 @@
+plugins {
+    id 'application'
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation project(':sdk')
+    implementation 'com.sun.net.httpserver:http:20070405'
+    implementation 'org.freemarker:freemarker:2.3.31'
+}
+
+application {
+    mainClass = 'com.friendlycaptcha.jvm.examples.Example'
+}
