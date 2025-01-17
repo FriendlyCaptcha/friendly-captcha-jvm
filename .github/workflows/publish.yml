@@ -21,11 +21,10 @@ jobs:
           java-version: '8'
       
       - name: Check version
-        working-directory: sdk
         run: |
           VERSION=$(grep 'sdkVersion =' sdk/build.gradle | sed 's/.*sdkVersion = "\(.*\)".*/\1/')
           if [ "$VERSION" != "${{ github.event.release.tag_name }}" ]; then
-            echo "Version mismatch: build.gradle.kts version is $VERSION, but release tag is ${{ github.event.release.tag_name }}"
+            echo "Version mismatch: build.gradle version is $VERSION, but release tag is ${{ github.event.release.tag_name }}"
             exit 1
           fi
       
