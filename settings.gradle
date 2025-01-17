@@ -1,0 +1,4 @@
+rootProject.name = 'FriendlyCaptchaJVMSDK'
+
+include 'sdk'
+include 'examples'
