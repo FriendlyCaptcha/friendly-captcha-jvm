@@ -1,6 +1,6 @@
 # Friendly Captcha JVM SDK
 
-A Java SDK for [Friendly Captcha](https://friendlycaptcha.com) that can be used from JVM languages like Java, Kotlin, Scala, Clojure, Groovy, etc. This SDK provides a simple way to interact with the Friendly Captcha API.
+A Java SDK for [Friendly Captcha](https://friendlycaptcha.com) that can be used from JVM languages like Java, Kotlin, Scala, Clojure, Groovy, etc. This SDK provides a simple way to interact with the Friendly Captcha API. It is compatible with Java 8 and later.
 
 > This library is for [Friendly Captcha v2 only](https://developer.friendlycaptcha.com/). If you are looking for a v1 library, we recommend using [dheid/friendlycaptcha](https://github.com/dheid/friendlycaptcha).
 
@@ -10,9 +10,9 @@ Add the following dependency to your `pom.xml`:
 
 ```xml
 <dependency>
-    <groupId>com.friendlycaptcha</groupId>
-    <artifactId>friendly-captcha-jvm</artifactId>
-    <version>1.0.0</version>
+    <groupId>com.friendlycaptcha.jvm</groupId>
+    <artifactId>sdk</artifactId>
+    <version>0.1.0</version>
 </dependency>
 ```
 
@@ -54,9 +54,25 @@ if (!result.shouldAccept()) {
 // ...
 ```
 
+## Development
+You can build the SDK using 
+
+```bash
+./gradlew :sdk:build
+```
+
+and run the tests using
+
+```bash
+docker run -p 1090:1090 friendlycaptcha/sdk-testserver:latest
+./gradlew :sdk:test
+```
+
+Make sure you are running the SDK Testserver first
+
 ## Example
 
-A standalone example can be found in [src/main/java/com/friendlycaptcha/sdk/Example.java](src/main/java/com/friendlycaptcha/sdk/Example.java).
+A standalone example can be found in [src/main/java/com/friendlycaptcha/examples/Example.java](src/main/java/com/friendlycaptcha/examples/Example.java).
 
 This example serves a HTML form with a Friendly Captcha widget and validates the user's response.
 
@@ -65,9 +81,7 @@ This example serves a HTML form with a Friendly Captcha widget and validates the
 To run the example, execute the following commands:
 
 ```shell
-mvn clean install
-
-FRC_SITEKEY=<your sitekey> FRC_APIKEY=<your api key> mvn exec:java -pl examples -Dexec.mainClass="com.friendlycaptcha.examples.Example"
+FRC_SITEKEY=<your sitekey> FRC_APIKEY=<your api key> ./gradlew :examples:run
 ```
 
 Then open [http://localhost:8080](http://localhost:8080) in your browser.

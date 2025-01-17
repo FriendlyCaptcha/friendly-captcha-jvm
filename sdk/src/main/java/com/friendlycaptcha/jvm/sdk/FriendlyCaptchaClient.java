@@ -76,7 +76,7 @@ public class FriendlyCaptchaClient {
                 connection.setRequestMethod("POST");
                 connection.setRequestProperty("Content-Type", "application/json");
                 connection.setRequestProperty("Accept", "application/json");
-                connection.setRequestProperty("Frc-Sdk", Metadata.getInstance().sdkIdentifier);
+                connection.setRequestProperty("Frc-Sdk", Version.SDK_IDENTIFIER);
                 connection.setRequestProperty("X-Api-Key", this.apiKey);
                 connection.setDoOutput(true);
                 connection.setConnectTimeout(timeout);
