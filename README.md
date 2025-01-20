@@ -70,9 +70,13 @@ docker run -p 1090:1090 friendlycaptcha/sdk-testserver:latest
 
 Make sure you are running the SDK Testserver first
 
+### Minting a release
+
+Bump the version in `sdk/build.gradle`, run `./gradlew :sdk:build`, merge the changes to `main` and create a new release on GitHub.
+
 ## Example
 
-A standalone example can be found in [src/main/java/com/friendlycaptcha/examples/Example.java](src/main/java/com/friendlycaptcha/examples/Example.java).
+A standalone example can be found in [Example.java](examples/src/main/java/com/friendlycaptcha/jvm/examples/Example.java).
 
 This example serves a HTML form with a Friendly Captcha widget and validates the user's response.
 
