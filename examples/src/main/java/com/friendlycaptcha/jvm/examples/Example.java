@@ -1,4 +1,4 @@
-package com.friendlycaptcha.examples;
+package com.friendlycaptcha.jvm.examples;
 
 import com.friendlycaptcha.jvm.sdk.FriendlyCaptchaClient;
 import com.friendlycaptcha.jvm.sdk.FriendlyCaptchaClientOptions;
