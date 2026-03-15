@@ -1,10 +1,15 @@
 package com.friendlycaptcha.jvm.sdk;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 /**
- * SiteverifyRequest represents the request body for the /api/v2/captcha/siteverify endpoint.
+ * SiteverifyRequest represents the request body for the
+ * /api/v2/captcha/siteverify endpoint.
  */
 public class SiteverifyRequest {
     private String response;
+
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private String sitekey;
 
     /**

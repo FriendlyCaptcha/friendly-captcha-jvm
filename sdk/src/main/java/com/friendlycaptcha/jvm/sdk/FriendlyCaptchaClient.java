@@ -12,6 +12,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class FriendlyCaptchaClient {
@@ -65,14 +66,7 @@ public class FriendlyCaptchaClient {
 
         CompletableFuture<VerifyResult> future = CompletableFuture.supplyAsync(() -> {
             try {
-                URL url = URI.create(this.apiEndpoint).toURL();
-                url = new URI(
-                    url.getProtocol(),
-                    null,
-                    url.getHost(),
-                    url.getPort(),
-                    "/api/v2/captcha/siteverify", null, null).toURL();
-                HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+                HttpURLConnection connection = openApiConnection("/api/v2/captcha/siteverify");
                 connection.setRequestMethod("POST");
                 connection.setRequestProperty("Content-Type", "application/json");
                 connection.setRequestProperty("Accept", "application/json");
@@ -119,6 +113,95 @@ public class FriendlyCaptchaClient {
             }
             return res;
         });
+    }
+
+    public CompletableFuture<RiskIntelligenceRetrieveResult> retrieveRiskIntelligence(String token) {
+        RiskIntelligenceRetrieveRequest request = new RiskIntelligenceRetrieveRequest();
+        request.setToken(token);
+        if (this.sitekey != null) {
+            request.setSitekey(this.sitekey);
+        }
+
+        RiskIntelligenceRetrieveResult result = new RiskIntelligenceRetrieveResult();
+        String body;
+        try {
+            ObjectMapper objectMapper = ObjectMapperSingleton.getInstance();
+            body = objectMapper.writeValueAsString(request);
+        } catch (IOException e) {
+            result.setException(e);
+            result.setErrorCode(ErrorCode.FAILED_TO_ENCODE_REQUEST);
+            return CompletableFuture.completedFuture(result);
+        }
+
+        CompletableFuture<RiskIntelligenceRetrieveResult> future = CompletableFuture.supplyAsync(() -> {
+            try {
+                HttpURLConnection connection = openApiConnection("/api/v2/riskIntelligence/retrieve");
+                connection.setRequestMethod("POST");
+                connection.setRequestProperty("Content-Type", "application/json");
+                connection.setRequestProperty("Accept", "application/json");
+                connection.setRequestProperty("Frc-Sdk", Version.SDK_IDENTIFIER);
+                connection.setRequestProperty("X-Api-Key", this.apiKey);
+                connection.setDoOutput(true);
+                connection.setConnectTimeout(timeout);
+                connection.setReadTimeout(timeout);
+
+                connection.getOutputStream().write(body.getBytes());
+
+                int status = connection.getResponseCode();
+                result.setStatus(status);
+
+                ObjectMapper objectMapper = ObjectMapperSingleton.getInstance();
+                InputStream inputStream = status >= 400 ? connection.getErrorStream() : connection.getInputStream();
+                if (status >= 400 && status < 500) {
+                    result.setErrorCode(ErrorCode.FAILED_DUE_TO_CLIENT_ERROR);
+                }
+
+                try {
+                    JsonNode rawResponse = objectMapper.readTree(inputStream);
+                    RiskIntelligenceRetrieveResponse response = objectMapper.treeToValue(
+                            rawResponse,
+                            RiskIntelligenceRetrieveResponse.class
+                    );
+                    response.setRawJson(rawResponse);
+                    result.setResponse(response);
+                } catch (IOException e) {
+                    result.setException(e);
+                    result.setErrorCode(ErrorCode.FAILED_TO_DECODE_RESPONSE);
+                }
+
+            } catch (IOException e) {
+                result.setException(e);
+                result.setErrorCode(ErrorCode.REQUEST_FAILED);
+            } catch (URISyntaxException e) {
+                result.setException(e);
+                result.setErrorCode(ErrorCode.FAILED_DUE_TO_CLIENT_ERROR);
+            }
+            return result;
+        });
+
+        CompletableFuture<RiskIntelligenceRetrieveResult> timeoutFuture = failAfter(timeout, TimeUnit.MILLISECONDS);
+
+        return future.applyToEither(timeoutFuture, res -> {
+            if (res == null) {
+                result.setErrorCode(ErrorCode.RESPONSE_TIMEOUT);
+            }
+            return res;
+        });
+    }
+
+    private HttpURLConnection openApiConnection(String path) throws IOException, URISyntaxException {
+        URL url = URI.create(this.apiEndpoint).toURL();
+        URL endpoint = new URI(
+                url.getProtocol(),
+                null,
+                url.getHost(),
+                url.getPort(),
+                path,
+                null,
+                null
+        ).toURL();
+
+        return (HttpURLConnection) endpoint.openConnection();
     }
 
     private static <T> CompletableFuture<T> failAfter(long timeout, TimeUnit unit) {
