@@ -37,6 +37,7 @@ public class FriendlyCaptchaClientTest {
         public String name;
         public String response;
         public boolean strict;
+        public JsonNode siteverify_response;
         public CaptchaSiteverifyExpectation expectation;
 
         @Override
@@ -136,6 +137,61 @@ public class FriendlyCaptchaClientTest {
         assertEquals(testCase.expectation.should_accept, result.shouldAccept(), testCase.name);
         assertEquals(testCase.expectation.was_able_to_verify, result.wasAbleToVerify(), testCase.name);
         assertEquals(testCase.expectation.is_client_error, result.isClientError(), testCase.name);
+
+        if (result.getResponse() != null && result.getResponse().isSuccess()) {
+            VerifyResponse expectedResponse = objectMapper.treeToValue(testCase.siteverify_response,
+                    VerifyResponse.class);
+
+            VerifyResponseData exp = expectedResponse.getData();
+            VerifyResponseData res = result.getResponse().getData();
+
+            assertNotNull(res, "Siteverify response data should not be null on success");
+            assertNotNull(exp, "Expected siteverify response data should not be null on success");
+            if (res == null || exp == null) {
+                return;
+            }
+
+            assertEquals(exp.getEventId(), res.getEventId(), "Event ID does not match expected value");
+
+            VerifyResponseChallengeData expChallenge = exp.getChallenge();
+            VerifyResponseChallengeData resChallenge = res.getChallenge();
+            assertNotNull(resChallenge, "Challenge data should not be null on success");
+            assertNotNull(expChallenge, "Expected challenge data should not be null on success");
+            if (expChallenge != null && resChallenge != null) {
+                assertEquals(expChallenge.getTimestamp(), resChallenge.getTimestamp(), "Challenge timestamp mismatch");
+                assertEquals(expChallenge.getOrigin(), resChallenge.getOrigin(), "Challenge origin mismatch");
+            }
+
+            assertEquals(
+                    exp.getRiskIntelligence(),
+                    res.getRiskIntelligence(),
+                    "Risk intelligence data does not match expected value");
+
+            JsonNode expRiskIntelligence = exp.getRiskIntelligence();
+            JsonNode resRiskIntelligence = res.getRiskIntelligence();
+            if (expRiskIntelligence != null && !expRiskIntelligence.isNull() && resRiskIntelligence != null
+                    && !resRiskIntelligence.isNull()) {
+                assertTrue(
+                        resRiskIntelligence.toString().contains("header_user_agent"),
+                        "Risk intelligence should include header_user_agent");
+
+                JsonNode expHeaderUserAgent = expRiskIntelligence.path("client").path("header_user_agent");
+                JsonNode resHeaderUserAgent = resRiskIntelligence.path("client").path("header_user_agent");
+                if (!expHeaderUserAgent.isMissingNode() && !expHeaderUserAgent.isNull()) {
+                    assertEquals(
+                            expHeaderUserAgent.asText(),
+                            resHeaderUserAgent.asText(),
+                            "Client header user agent does not match");
+                }
+
+                JsonNode expBrowserId = expRiskIntelligence.path("client").path("browser").path("id");
+                JsonNode resBrowserId = resRiskIntelligence.path("client").path("browser").path("id");
+                if (!expBrowserId.isMissingNode() && !expBrowserId.isNull()
+                        && !resBrowserId.isMissingNode() && !resBrowserId.isNull()) {
+                    assertEquals(expBrowserId.asText(), resBrowserId.asText(), "Client browser ID does not match");
+                }
+            }
+        }
     }
 
     @ParameterizedTest(name = "{0}")
