@@ -12,7 +12,6 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class FriendlyCaptchaClient {
@@ -157,13 +156,7 @@ public class FriendlyCaptchaClient {
                 }
 
                 try {
-                    JsonNode rawResponse = objectMapper.readTree(inputStream);
-                    RiskIntelligenceRetrieveResponse response = objectMapper.treeToValue(
-                            rawResponse,
-                            RiskIntelligenceRetrieveResponse.class
-                    );
-                    response.setRawJson(rawResponse);
-                    result.setResponse(response);
+                    result.setResponse(objectMapper.readValue(inputStream, RiskIntelligenceRetrieveResponse.class));
                 } catch (IOException e) {
                     result.setException(e);
                     result.setErrorCode(ErrorCode.FAILED_TO_DECODE_RESPONSE);

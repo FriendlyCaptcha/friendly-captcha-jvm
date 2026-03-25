@@ -2,7 +2,6 @@ package com.friendlycaptcha.jvm.sdk;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.JsonNode;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class VerifyResponseData {
@@ -12,7 +11,7 @@ public class VerifyResponseData {
     private String eventId;
 
     @JsonProperty("risk_intelligence")
-    private JsonNode riskIntelligence;
+    private RiskIntelligenceData riskIntelligence;
 
     public VerifyResponseChallengeData getChallenge() {
         return challenge;
@@ -22,7 +21,7 @@ public class VerifyResponseData {
         return eventId;
     }
 
-    public JsonNode getRiskIntelligence() {
+    public RiskIntelligenceData getRiskIntelligence() {
         return riskIntelligence;
     }
 
