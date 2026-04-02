@@ -2,7 +2,7 @@
 package com.friendlycaptcha.jvm.sdk;
 
 public final class Version {
-    public static final String SDK_VERSION = "1.1.0";
+    public static final String SDK_VERSION = "1.2.0";
     public static final String SDK_NAME = "friendly-captcha-jvm";
-    public static final String SDK_IDENTIFIER = "friendly-captcha-jvm@1.1.0";
+    public static final String SDK_IDENTIFIER = "friendly-captcha-jvm@1.2.0";
 }

@@ -58,6 +58,27 @@ if (!result.shouldAccept()) {
 // ...
 ```
 
+You can also retrieve risk intelligence data from a token:
+
+```java
+String token = "...";
+RiskIntelligenceRetrieveResult retrieveResult = client.retrieveRiskIntelligence(token).get();
+
+if (!retrieveResult.wasAbleToRetrieve()) {
+    System.out.println("COULD NOT RETRIEVE RISK INTELLIGENCE!\n" +
+    "> Error Code: " + retrieveResult.getErrorCode() + "\n" +
+    "> Response Error: " + retrieveResult.getResponseError());
+    return;
+}
+
+if (!retrieveResult.isValid()) {
+    System.out.println("Risk intelligence token is invalid or expired.");
+    return;
+}
+
+RiskIntelligenceRetrieveResponseData data = retrieveResult.getResponse().getData();
+```
+
 ## Development
 You can build the SDK using 
 
@@ -82,14 +103,14 @@ Bump the version in `sdk/build.gradle`, run `./gradlew :sdk:build`, merge the ch
 
 A standalone example can be found in [Example.java](examples/src/main/java/com/friendlycaptcha/jvm/examples/Example.java).
 
-This example serves a HTML form with a Friendly Captcha widget and validates the user's response.
+This example serves a single HTML form with Friendly Captcha and risk intelligence widgets, validates the CAPTCHA response, and logs retrieved risk intelligence data server-side.
 
 ![Screenshot](example.png)
 
-To run the example, execute the following commands:
+To run the example, execute:
 
 ```shell
-FRC_SITEKEY=<your sitekey> FRC_APIKEY=<your api key> ./gradlew :examples:run
+FRC_SITEKEY=<your sitekey> FRC_APIKEY=<your api key> FRC_API_ENDPOINT=<api endpoint> FRC_WIDGET_ENDPOINT=<widget endpoint> ./gradlew :examples:run
 ```
 
 Then open [http://localhost:8080](http://localhost:8080) in your browser.

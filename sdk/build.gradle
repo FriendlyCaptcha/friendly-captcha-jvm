@@ -6,7 +6,7 @@ plugins {
 }
 
 ext {
-    sdkVersion = "1.1.0"
+    sdkVersion = "1.2.0"
     sdkName = "friendly-captcha-jvm"
 }
 

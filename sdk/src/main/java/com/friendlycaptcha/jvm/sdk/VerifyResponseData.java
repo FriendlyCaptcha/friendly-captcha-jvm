@@ -10,6 +10,9 @@ public class VerifyResponseData {
     @JsonProperty("event_id")
     private String eventId;
 
+    @JsonProperty("risk_intelligence")
+    private RiskIntelligenceData riskIntelligence;
+
     public VerifyResponseChallengeData getChallenge() {
         return challenge;
     }
@@ -18,7 +21,12 @@ public class VerifyResponseData {
         return eventId;
     }
 
+    public RiskIntelligenceData getRiskIntelligence() {
+        return riskIntelligence;
+    }
+
     public String toString() {
-        return "VerifyResponseData{challenge=" + this.challenge + ", eventId=" + this.eventId + "}";
+        return "VerifyResponseData{challenge=" + this.challenge + ", eventId=" + this.eventId
+                + ", riskIntelligence=" + this.riskIntelligence + "}";
     }
 }
