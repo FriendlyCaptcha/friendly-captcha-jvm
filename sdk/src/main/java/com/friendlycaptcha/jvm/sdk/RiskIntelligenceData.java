@@ -50,7 +50,7 @@ public class RiskIntelligenceData {
     }
 
     /**
-     * Risk score value ranging from 0 to 5.
+     * Risk score value ranging from 1 to 5.
      *
      * 0 = Unknown or missing,
      * 1 = Very low,
