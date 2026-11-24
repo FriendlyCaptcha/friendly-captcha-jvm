@@ -18,6 +18,12 @@ public class FriendlyCaptchaClient {
     private static final String GLOBAL_ENDPOINT = "https://global.frcapi.com";
     private static final String EU_ENDPOINT = "https://eu.frcapi.com";
 
+    /**
+     * Longer captcha responses are truncated to this before they are sent. It's above the API's request body limit, so
+     * the API still answers them as invalid. Truncating keeps the upload short enough to finish before the timeout.
+     */
+    static final int MAX_CAPTCHA_RESPONSE_LENGTH = 2 * 1024 * 1024;
+
     private static final int THREAD_POOL_SIZE = Runtime.getRuntime().availableProcessors() * 4; // Arbitrary..
     private static final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(THREAD_POOL_SIZE);
 
@@ -46,6 +52,9 @@ public class FriendlyCaptchaClient {
     }
 
     public CompletableFuture<VerifyResult> verifyCaptchaResponse(String response) {
+        if (response != null && response.length() > MAX_CAPTCHA_RESPONSE_LENGTH) {
+            response = response.substring(0, MAX_CAPTCHA_RESPONSE_LENGTH);
+        }
         SiteverifyRequest siteverifyRequest = new SiteverifyRequest();
         siteverifyRequest.setResponse(response);
         if (this.sitekey != null) {
